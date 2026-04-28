@@ -1,9 +1,9 @@
-## Task Manager API
+# Task Manager API
 
-# Stack
+## Stack
 
 FastAPI + PostgreSQL + Docker
 
-# Core Concepts
+## Core Concepts
 
 Routing, CRUD, DB connections, error handling, HTTP methods
