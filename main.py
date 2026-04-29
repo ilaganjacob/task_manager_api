@@ -58,7 +58,10 @@ async def root():
 @app.get("/tasks")
 async def get_tasks():
     conn = app.state.db_conn
-    return {"tasks": tasks}
+    all_tasks = await conn.execute("""
+        SELECT * from tasks
+""")
+    return all_tasks
 
 
 @app.get("/tasks/{id}")
