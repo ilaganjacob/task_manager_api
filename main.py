@@ -17,13 +17,14 @@ db_url = os.getenv("supabase_url")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
-    conn = await asyncpg.connect(db_url, statement_cache_size=0)
+    app.state.db_conn = await asyncpg.connect(db_url, statement_cache_size=0)
 
     # assign to app.state so we share this resource across the app instance
-    app.state.db_conn = conn
+    print("Db connected!")
+
     yield
 
-    await conn.close()
+    await app.state.db_conn.close()
 
 
 # defines what the CLIENT sends. the SERVER defines the ID so we don't define it in here
@@ -58,7 +59,7 @@ async def root():
 @app.get("/tasks")
 async def get_tasks():
     conn = app.state.db_conn
-    all_tasks = await conn.execute("""
+    all_tasks = await conn.fetch("""
         SELECT * from tasks
 """)
     return all_tasks
