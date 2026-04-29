@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from supabase import create_client, Client
+
+import os
 
 load_dotenv()
 
