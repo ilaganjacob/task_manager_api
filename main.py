@@ -17,7 +17,7 @@ db_url = os.getenv("supabase_url")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
-    conn = await asyncpg.connect(db_url)
+    conn = await asyncpg.connect(db_url, statement_cache_size=0)
 
     # assign to app.state so we share this resource across the app instance
     app.state.db_conn = conn
