@@ -1,13 +1,17 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from supabase import create_client, Client
+import asyncio
+import asyncpg
+import datetime
 
 import os
 
 load_dotenv()
 
 app = FastAPI()
+
+
 
 # defines what the CLIENT sends. the SERVER defines the ID so we don't define it in here
 class Task(BaseModel):
