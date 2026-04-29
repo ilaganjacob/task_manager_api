@@ -58,8 +58,7 @@ async def root():
 
 @app.get("/tasks")
 async def get_tasks():
-    conn = app.state.db_conn
-    all_tasks = await conn.fetch("""
+    all_tasks = await app.state.db_conn.fetch("""
         SELECT * from tasks
 """)
     return all_tasks
@@ -67,10 +66,10 @@ async def get_tasks():
 
 @app.get("/tasks/{id}")
 async def get_task(id: int):
-    for task in tasks:
-        if task["id"] == id:
-            return task
-    return {"message": "task not found"}
+    task = await app.state.db_conn.fetchrow("""
+    SELECT * FROM tasks WHERE id = {id}
+""")
+    return task
 
 
 @app.post("/tasks")
