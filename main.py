@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-
+from pydantic import BaseModel
 app = FastAPI()
 tasks = [
-  {"id": 1, "desc": "first"},
-  {"id": 2, "desc": "second"},
+  {"id": 1, "desc": "first", "done": False},
+  {"id": 2, "desc": "second", },
 ]
 
 
