@@ -4,9 +4,7 @@ from dotenv import load_dotenv
 
 from contextlib import asynccontextmanager
 
-import asyncio
 import asyncpg
-import datetime
 import os
 
 load_dotenv()
