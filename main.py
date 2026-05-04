@@ -27,26 +27,13 @@ async def lifespan(app: FastAPI):
 
 # defines what the CLIENT sends. the SERVER defines the ID so we don't define it in here
 class Task(BaseModel):
-    desc: str
+    task_desc: str
     done: bool = False
 
 
 app = FastAPI(lifespan=lifespan)
 
-
-tasks = [
-    {"id": 1, "desc": "first", "done": False},
-    {"id": 2, "desc": "second", "done": False},
-]
-
-
-def get_new_id():
-    new_id = 1
-    # loop through each task in tasks
-    # at each task["id"], we can just set new_id = task["id"] + 1
-    for task in tasks:
-        new_id = task["id"] + 1
-    return new_id
+tasks = []
 
 
 @app.get("/")
@@ -64,9 +51,13 @@ async def get_tasks():
 
 @app.get("/tasks/{id}")
 async def get_task(id: int):
-    task = await app.state.db_conn.fetchrow("""
-    SELECT * FROM tasks WHERE id = {id}
-""")
+    task = await app.state.db_conn.fetchrow(
+        """
+    SELECT * FROM tasks WHERE id = $1
+        
+    """,
+        id,
+    )
     return task
 
 
@@ -76,18 +67,32 @@ async def create_task(task: Task):
     # FastAPI parses the task into a Pydantic object -a task
     # now we need to make it into a dict, assign it a unique id, and take the "desc" and "done" from the task and finish
     # we cannot just take the task
-    new_task = {"id": get_new_id(), "desc": task.desc, "done": task.done}
-    tasks.append(new_task)
+    new_task = await app.state.db_conn.fetchrow(
+        """
+                                         INSERT INTO tasks(task_desc, done)
+                                         VALUES($1, $2)
+                                         RETURNING *
+                                         """,
+        task.task_desc,
+        task.done,
+    )
     return new_task
 
 
 @app.put("/tasks/{id}")
 async def update_task(id: int, task: Task):
-    for i, existing in enumerate(tasks):
-        if existing["id"] == id:
-            tasks[i] = {"id": id, "desc": task.desc, "done": task.done}
-            return tasks[i]
-    return {"message": "task not found"}
+    the_task = await app.state.db_conn.fetchrow(
+        """
+                                                UPDATE tasks
+                                                SET task_desc=$1, done=$2
+                                                WHERE ID=$3
+                                                RETURNING *
+                                                """,
+        task.task_desc,
+        task.done,
+        id,
+    )
+    return the_task
 
 
 @app.delete("/tasks/{id}")
