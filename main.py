@@ -58,7 +58,11 @@ async def get_task(id: int):
     """,
         id,
     )
-    return task
+
+    if task:
+        return task
+    else:
+        return {"message": "task not found"}
 
 
 @app.post("/tasks")
@@ -97,4 +101,13 @@ async def update_task(id: int, task: Task):
 
 @app.delete("/tasks/{id}")
 async def delete_task(id: int):
-    return
+    the_task = await app.state.db_conn.fetchrow(
+        """
+                                    DELETE FROM tasks
+                                    WHERE id = $1
+                                    RETURNING *
+                                    """,
+        id,
+    )
+
+    return the_task
