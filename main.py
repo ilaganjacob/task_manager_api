@@ -97,10 +97,4 @@ async def update_task(id: int, task: Task):
 
 @app.delete("/tasks/{id}")
 async def delete_task(id: int):
-    # This removes the task from the tasks list
-    for i, task in enumerate(tasks):
-        # this is the task we're searching for
-        if task["id"] == id:
-            tasks.pop(i)
-            return {"message": "task deleted"}
-    return {"message": "task not found"}
+    return
